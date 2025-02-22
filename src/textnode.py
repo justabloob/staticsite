@@ -1,15 +1,21 @@
 from enum import Enum
 
-class Texttype(Enum):
-    NORMAL_TEXT = text
-    BOLD_TEXT = **{text}**
-    ITALIC_TEXT = *{text}*
-    CODE_TEXT = `{text}`
-    LINKS = [text](url)
-    IMAGES = ![text](url)
+class TextType(Enum):
+    NORMAL = "normal"
+    BOLD = "bold"
+    ITALIC = "italic"
+    CODE = "code"
+    LINKS = "links"
+    IMAGES = "images"
 
-class TextNode(Texttype):
-    def __init__(self, text, url=None):
-        self.text_type = Texttype
+class TextNode():
+    def __init__(self, text, text_type, url=None):
+        self.text_type = text_type
         self.text = text
         self.url = url
+    
+    def __eq__(self, other):
+        return self.text == other.text and self.url == other.url and self.text_type == other.text_type
+
+    def __repr__(self):
+        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
