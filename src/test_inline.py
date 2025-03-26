@@ -1,6 +1,6 @@
 import unittest
 from markdown_inline import (split_nodes_delimiter, extract_markdown_images,
-                             extract_markdown_links)
+                             extract_markdown_links, split_nodes_image, split_nodes_link)
 from textnode import TextNode, TextType
 
 class TestInlineMarkdown(unittest.TestCase):
@@ -109,6 +109,8 @@ class TestInlineMarkdown(unittest.TestCase):
         # Test no links
         matches = extract_markdown_links("Just plain text, no links here.")
         self.assertListEqual([], matches)
+
+    
 
 
 if __name__ == "__main__":
