@@ -10,20 +10,14 @@ class BlockType(Enum):
     ORDERED_LIST = "ordered_list"
 
 def markdown_to_block(markdown):
-    # Split the markdown string into lines
-    lines = markdown.split('\n')
-    
-    # Initialize an empty list to store the block lines
-    block_lines = []
-    
-    # Iterate over each line in the markdown string
-    for line in lines:
-        # If the line is not empty, add it to the block lines
-        if line.strip():
-            block_lines.append(line)
-    
-    # Join the block lines with newlines and return the result
-    return '\n'.join(block_lines)
+    blocks = markdown.split("\n\n")
+    filtered_blocks = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        filtered_blocks.append(block)
+    return filtered_blocks
 
 def block_to_block_type(block):
     lines = block.split('\n')
