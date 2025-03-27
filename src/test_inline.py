@@ -110,7 +110,70 @@ class TestInlineMarkdown(unittest.TestCase):
         matches = extract_markdown_links("Just plain text, no links here.")
         self.assertListEqual([], matches)
 
+    def test_split_images(self):
+        node = TextNode("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)", TextType.TEXT,)
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
+
+        # Test no images
+        node = TextNode("This is text with no images", TextType.TEXT)
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [TextNode("This is text with no images", TextType.TEXT)],
+            new_nodes,
+        )
+
+        # Test multiple images
+        node = TextNode("![first](https://example.com/1.jpg) and ![second](https://example.com/2.jpg)", TextType.TEXT)
+        new_nodes = split_nodes_image([node]) 
+        self.assertListEqual(
+            [
+                TextNode("first", TextType.IMAGE, "https://example.com/1.jpg"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("second", TextType.IMAGE, "https://example.com/2.jpg"),
+            ],
+            new_nodes,
+        )
     
+    def test_split_link(self):
+        node = TextNode("This is text with a [link](https://www.google.com) and another [second link](https://www.example.com)", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://www.google.com"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second link", TextType.LINK, "https://www.example.com"),
+            ],
+            new_nodes,
+        )
+
+        # Test no links
+        node = TextNode("This is text with no links", TextType.TEXT)
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [TextNode("This is text with no links", TextType.TEXT)],
+            new_nodes,
+        )
+        # Test multiple links
+        node = TextNode("[first](https://example.com/1) and [second](https://example.com/2)", TextType.TEXT)
+        new_nodes = split_nodes_link([node]) 
+        self.assertListEqual(
+            [
+                TextNode("first", TextType.LINK, "https://example.com/1"),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("second", TextType.LINK, "https://example.com/2"),
+            ],
+            new_nodes,
+        )
 
 
 if __name__ == "__main__":
