@@ -1,4 +1,5 @@
 from enum import Enum
+import re
 from htmlnode import HTMLNode, LeafNode, ParentNode
 from textnode import TextNode, text_node_to_html_node
 from markdown_inline import text_to_textnodes
@@ -75,11 +76,42 @@ def text_to_children(text):
 def block_to_html_node(block, block_type):
     # Convert the block to an HTML node based on its type
     if block_type == BlockType.PARAGRAPH:
-        return HTMLNode(tag="<p>", value=block)
+        return HTMLNode(tag="p", value=None, children=text_to_children(block))
     elif block_type == BlockType.HEADING:
-        level = block.count("#")
-        tag = f"<h{level}>"
-        value = block[level:].strip()
-        return HTMLNode(tag=tag, value=value)
+        level = block.count("#") # Count the number of '#' characters to determine the heading level
+        tag = f"h{level}" # Set the tag to h1, h2, etc. based on the level
+        text = block[level:].strip() # Get the text after the '#' characters
+        return HTMLNode(tag=tag, value=None, children=text_to_children(text))
     elif block_type == BlockType.CODE:
-        pass
+        text = block.strip("```").strip() # Remove the backticks and strip whitespace
+        code_node = HTMLNode(tag="code", value=text, children=None)
+        return HTMLNode(tag="pre", value=None, children=[code_node])
+    elif block_type == BlockType.QUOTE:
+        lines = block.split("\n")
+        child = []
+        for line in lines:
+            stripped_line = line.lstrip('> ').strip() # Remove the '>' character and strip whitespace
+            if stripped_line:
+                child.append(HTMLNode(tag="p", value=stripped_line, children=None))
+        return HTMLNode(tag="blockquote", value=None, children=child)
+    elif block_type == BlockType.UNORDERED_LIST:
+        lines = block.split("\n")
+        child = []
+        for line in lines:
+            stripped_line = line.lstrip('- ').strip() # Remove the '-' character and strip whitespace
+            if stripped_line:
+                child.append(HTMLNode(tag="li", value=stripped_line, children=None))
+        return HTMLNode(tag="ul", value=None, children=child)
+    elif block_type == BlockType.ORDERED_LIST:
+        pattern = r"^\d+\.\s" # Regex pattern to match "<number>. " at the start of the line
+        lines = block.split("\n")
+        child = []
+        for line in lines:
+            # Check if the line starts with a number and a dot
+            if re.match(pattern, line.strip()):
+                # Remove the number and dot to isolate the content
+                stripped_line = re.sub(pattern, "", line.strip())
+                child.append(HTMLNode(tag="li", value=stripped_line, children=None))
+        return HTMLNode(tag="ol", value=None, children=child)
+    else:
+        raise ValueError(f"Invalid block type: {block_type}")
