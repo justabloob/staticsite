@@ -1,8 +1,9 @@
 from textnode import *
+from copystatic import copy_files_recursive
 
 def main():
-    node = TextNode("This is a test", TextType.BOLD, "https://www.google.com")
-    print(node)
+    copy_files_recursive("static", "public")
+
 
 if __name__ == "__main__":
     main()
