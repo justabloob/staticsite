@@ -4,11 +4,8 @@ import shutil
 def copy_files_recursive(source, destination):
     # This function copies the contents of a directory to another directory
     # check if destination exists
-    if os.path.exists(destination):
-        # if it exists, clean it
-        shutil.rmtree(destination)
-    # create destination directory
-    os.mkdir(destination)
+    if not os.path.exists(destination):
+        os.mkdir(destination)
     # process each item in the source directory
     for item in os.listdir(source):
         src_path = os.path.join(source, item)
