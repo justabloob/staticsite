@@ -34,3 +34,19 @@ def generate_page(from_path, template_path, dest_path):
     dest_file.write(final_html)
     dest_file.close()
     print(f"Page generated at {dest_path}")
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    # process each item in the content directory
+    for item in os.listdir(dir_path_content):
+        src_path = os.path.join(dir_path_content, item)
+        dest_path = os.path.join(dest_dir_path, item)
+        print(f"Generating page from {src_path} to {dest_path} using {template_path}")
+        # check if it's a file
+        if os.path.isfile(src_path) and src_path.endswith(".md"):
+            # Convert .md to .html in the destination path
+            html_dest_path = dest_path.replace(".md", ".html")
+            generate_page(src_path, template_path, html_dest_path)
+        elif not os.path.isfile(src_path):
+            # If it's a directory, create it and call recursively
+            os.makedirs(dest_path, exist_ok=True)
+            generate_pages_recursive(src_path, template_path, dest_path)
